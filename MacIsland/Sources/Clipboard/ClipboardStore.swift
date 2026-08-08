@@ -157,8 +157,7 @@ final class ClipboardStore {
     func deleteText(_ item: ClipboardTextItem) {
         queue.sync {
             textItems.removeAll { $0.id == item.id }
-            try? FileManager.default.removeItem(at: item.fileURL)
-            saveJSON(imageItems, to: imageIndexURL)
+            saveJSON(textItems, to: textIndexURL)
         }
     }
 
@@ -170,7 +169,7 @@ final class ClipboardStore {
         }
     }
 
-    private fun trimTextIfNeededLocked() {
+    private func trimTextIfNeededLocked() {
         if textItems.count > maxText {
             textItems = Array(textItems.prefix(maxText))
             saveJSON(textItems, to: textIndexURL)
