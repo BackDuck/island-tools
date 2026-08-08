@@ -32,7 +32,7 @@ final class CopyFlashController: ObservableObject {
     }
 
     func isFlashing(_ id: UUID) -> Bool {
-        activeID = id
+        activeID == id
     }
 }
 
