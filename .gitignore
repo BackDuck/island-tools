@@ -1,0 +1,6 @@
+.build/
+MacIsland.xcodeproj/
+*.xcuserdata/
+DerivedData/
+.DS_Store
+dist/
