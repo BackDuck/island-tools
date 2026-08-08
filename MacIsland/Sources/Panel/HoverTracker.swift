@@ -125,10 +125,6 @@ final class HoverTracker {
         return Date().timeIntervalSince(last) <= hysteresis
     }
 
-    /// �HotspotAt else { return false }
-        return Date().timeIntervalSince(last) <= hysteresis
-    }
-
     /// ⌘ (Command) / Control — быстрый доступ к Заметкам.
     /// deviceIndependentFlagsMask — чтобы poll timer и flagsChanged одинаково видели флаги с любой клавиатуры.
     private var isOpenNotesModifier: Bool {
