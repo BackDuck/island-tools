@@ -18,12 +18,8 @@ final class HoverTracker {
     private var isExpanded = false
     private var pointerInsidePanel = false
 
-    /// Высота hit-зоны у верхнего края (ниже нижней границы island).
-    private let hitHeight: CGFloat = 14
-    /// Запас по X относительно чёрного pill / notch.
-    private let horizontalPad: CGFloat = 28
     /// Минимальная ширина зоны, если notch не определён.
-    private let fallbackWidth: CGFloat = 220
+    private let fallbackWidth: CGFloat = 180
     /// Keep-alive: недавно были в hotspot — считаем «внутри» ещё ~150 мс.
     private let hysteresis: TimeInterval = 0.15
     private var lastInsideHotspotAt: Date?
@@ -90,7 +86,7 @@ final class HoverTracker {
         let insidePanel = insidePanelBounds || pointerInsidePanel
 
         // Пока открыта: tracked = panel ∪ hotspot.
-        // Пока закрыта: tracked = расширенный hotspot (+ hysteresis).
+        // Пока закрыта: tracked = hotspot внутри выреза (+ hysteresis).
         let insideTracked = isExpanded
             ? (insidePanel || insideHotspot)
             : insideHotspot
@@ -147,7 +143,7 @@ final class HoverTracker {
             guard let self else { return }
             self.showWorkItem = nil
             let loc = NSEvent.mouseLocation
-            // Повторная проверка: всё ещё в расширенной зоне / hysteresis / панели.
+            // Повторная проверка: всё ещё в зоне выреза / hysteresis / панели.
             if self.isInsideHotspot(loc)
                 || self.isWithinHysteresis()
                 || self.isInsidePanelFrame(loc)
@@ -196,7 +192,8 @@ final class HoverTracker {
         return frame.insetBy(dx: -2, dy: -2).contains(point)
     }
 
-    /// Расширенный hotspot: вся зона notch/island до верха экрана + запас по X и вниз.
+    /// Hotspot строго внутри выреза: по ширине — между menu-bar областями,
+    /// по высоте — только верхняя половина notch (нужно зайти примерно наполовину).
     private func isInsideHotspot(_ point: CGPoint) -> Bool {
         guard let screen = screenContaining(point) ?? NSScreen.main else { return false }
         return notchHitZone(on: screen).contains(point)
@@ -204,18 +201,19 @@ final class HoverTracker {
 
     private func notchHitZone(on screen: NSScreen) -> CGRect {
         let top = screen.frame.maxY
-        // До верха экрана включительно + воздух ниже pill.
-        let height = max(hitHeight + screen.safeAreaInsets.top, screen.safeAreaInsets.top + 8) + 6
+        let notchHeight = max(screen.safeAreaInsets.top, 1)
+        // Нижняя граница зоны — середина выреза; ниже него курсор ещё «снаружи».
+        let height = notchHeight * 0.5
 
         if let left = screen.auxiliaryTopLeftArea, let right = screen.auxiliaryTopRightArea {
-            let minX = left.maxX - horizontalPad
-            let maxX = right.minX + horizontalPad
+            let minX = left.maxX
+            let maxX = right.minX
             let width = max(maxX - minX, 80)
             return CGRect(x: minX, y: top - height, width: width, height: height)
         }
 
-        // Без notch — центральная полоска шире collapsed pill.
-        let width = max(fallbackWidth, IslandTheme.collapsedWidth + horizontalPad * 2)
+        // Без notch — узкая полоска у самого верха по центру.
+        let width = fallbackWidth
         let x = screen.frame.midX - width / 2
         return CGRect(x: x, y: top - height, width: width, height: height)
     }
