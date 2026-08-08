@@ -1,0 +1,39 @@
+name: MacIsland
+options:
+  bundleIdPrefix: dev.nursat
+  deploymentTarget:
+    macOS: "14.0"
+  createIntermediateGroups: true
+  groupSortPosition: top
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
+    PRODUCT_BUNDLE_IDENTIFIER: dev.nursat.MacIsland
+    CODE_SIGN_STYLE: Automatic
+    ENABLE_HARDENED_RUNTIME: YES
+targets:
+  MacIsland:
+    type: application
+    platform: macOS
+    sources:
+      - path: MacIsland/Sources
+    resources:
+      - path: MacIsland/Resources
+        optional: true
+    info:
+      path: MacIsland/Info.plist
+      properties:
+        LSUIElement: true
+        NSHighResolutionCapable: true
+    entitlements:
+      path: MacIsland/MacIsland.entitlements
+    settings:
+      base:
+        PRODUCT_NAME: Mac Island
+        PRODUCT_BUNDLE_IDENTIFIER: dev.nursat.MacIsland
+        INFOPLIST_FILE: MacIsland/Info.plist
+        GENERATE_INFOPLIST_FILE: false
+        LD_RUNPATH_SEARCH_PATHS: "@executable_path/../Frameworks"
+        COMBINE_HIDPI_IMAGES: YES
+        CODE_SIGN_ENTITLEMENTS: MacIsland/MacIsland.entitlements
